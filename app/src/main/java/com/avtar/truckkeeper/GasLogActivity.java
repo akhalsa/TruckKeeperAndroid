@@ -12,8 +12,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 /**
  * Created by avtar on 6/29/15.
@@ -22,7 +24,16 @@ public class GasLogActivity extends AppCompatActivity implements GlobalConstants
 
     private Button add_event;
     private GasDataSource mGasDataSource;
-
+    private ArrayList<GasEventPOJO> events;
+    private GasLogAdapter adapter;
+    private ListView mListView;
+    @Override
+    protected void onResume(){
+        super.onResume();
+        mListView = (ListView) findViewById(R.id.gas_list);
+        mListView.setAdapter(adapter);
+        reloadDataSet();
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,6 +44,10 @@ public class GasLogActivity extends AppCompatActivity implements GlobalConstants
         }catch (SQLException e){
             e.printStackTrace();
         }
+        events = new ArrayList<>();
+        adapter  = new GasLogAdapter(GasLogActivity.this, events);
+        ListView gas_list = (ListView) findViewById(R.id.gas_list);
+        gas_list.setAdapter(adapter);
 
         add_event = (Button) findViewById(R.id.add_entry);
         add_event.setOnClickListener(new View.OnClickListener() {
@@ -52,7 +67,8 @@ public class GasLogActivity extends AppCompatActivity implements GlobalConstants
 
                         Log.d("GAS", "will add: " + gallons.getText() + " in state: " + state.getText());
                         mGasDataSource.createGasEvent(Double.parseDouble(gallons.getText().toString()),
-                                state.getText().toString(), System.currentTimeMillis() );
+                                state.getText().toString(), System.currentTimeMillis());
+                        reloadDataSet();
                     }
                 });
                 alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -84,10 +100,18 @@ public class GasLogActivity extends AppCompatActivity implements GlobalConstants
         if (id == R.id.action_settings) {
             return true;
         }
+        if(id==R.id.main_screen){
+            finish();
+        }
 
         return super.onOptionsItemSelected(item);
 
     }
 
+    private void reloadDataSet(){
+        events.clear();
+        events.addAll(mGasDataSource.getAllEvents());
+        adapter.notifyDataSetChanged();
+    }
 
 }

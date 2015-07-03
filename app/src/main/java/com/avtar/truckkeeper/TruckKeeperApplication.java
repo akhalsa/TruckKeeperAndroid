@@ -21,7 +21,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * Created by avtar on 6/26/15.
  */
-public class TruckKeeperApplication  extends Application implements BootstrapNotifier {
+public class TruckKeeperApplication  extends Application implements BootstrapNotifier, GlobalConstants {
     private static final String TAG = "AndroidProximity";
     private RegionBootstrap regionBootstrap;
     private BackgroundPowerSaver backgroundPowerSaver;
@@ -36,9 +36,18 @@ public class TruckKeeperApplication  extends Application implements BootstrapNot
             Log.d(TAG, "filtered did exit region.");
             Intent intent = new Intent(TruckKeeperApplication.this, LocationService.class);
             getApplicationContext().stopService(intent);
-            serviceActive.set(false);
+            updateServiceStatus(false);
         }
     };
+
+    public boolean getServiceStatus(){
+        return serviceActive.get();
+    }
+
+    private void updateServiceStatus(boolean new_status){
+        serviceActive.set(new_status);
+        sendBroadcast(new Intent(BEACON_CONNECTION_UPDATE));
+    }
 
     public void onCreate() {
         super.onCreate();
@@ -69,7 +78,7 @@ public class TruckKeeperApplication  extends Application implements BootstrapNot
         // class will automatically cause the BeaconLibrary to save battery whenever the application
         // is not visible.  This reduces bluetooth power usage by about 60%
         //backgroundPowerSaver = new BackgroundPowerSaver(this);
-        beaconManager.setDebug(true);
+        //beaconManager.setDebug(true);
         beaconManager.setBackgroundBetweenScanPeriod(7000l);
         beaconManager.setBackgroundScanPeriod(3000l);
         beaconManager.setForegroundBetweenScanPeriod(7000l);
@@ -98,7 +107,7 @@ public class TruckKeeperApplication  extends Application implements BootstrapNot
         if(!serviceActive.get()){
             Intent intent = new Intent(this, LocationService.class);
             getApplicationContext().startService(intent);
-            serviceActive.set(true);
+            updateServiceStatus(true);
         }
         //no matter what we dont want the handler to be posting messages to the callback
         //mHandler.removeCallbacks(stopLocationService);
@@ -114,7 +123,7 @@ public class TruckKeeperApplication  extends Application implements BootstrapNot
         if(serviceActive.get() == true){
             Intent intent = new Intent(TruckKeeperApplication.this, LocationService.class);
             getApplicationContext().stopService(intent);
-            serviceActive.set(false);
+            updateServiceStatus(false);
         }
 
 

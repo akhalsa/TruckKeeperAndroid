@@ -1,5 +1,7 @@
 package com.avtar.truckkeeper;
 
+import android.location.Location;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
@@ -77,5 +79,13 @@ public class LocationPOJO {
         calendar.setTimeInMillis(time_stamp);
         String timestamp =  formatter.format(calendar.getTime());
         return state+": "+Double.valueOf(latitude)+", "+Double.valueOf(longitude)+" at: "+timestamp;
+    }
+
+    public Location convertToLocation(){
+        Location l = new Location("");
+        l.setLatitude(latitude);
+        l.setLongitude(longitude);
+        return l;
+
     }
 }

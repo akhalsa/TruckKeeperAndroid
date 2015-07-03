@@ -10,10 +10,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
@@ -34,6 +37,12 @@ public class MainActivity extends AppCompatActivity implements GlobalConstants {
         @Override
         public void onReceive(Context context, Intent intent) {
             reloadData();
+        }
+    };
+    private BroadcastReceiver mStatusReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            updateConnectionStatus();
         }
     };
     private ArrayList<StatePair> pairs;
@@ -57,14 +66,20 @@ public class MainActivity extends AppCompatActivity implements GlobalConstants {
             myCalendar = Calendar.getInstance();
             myCalendar.setTimeInMillis(System.currentTimeMillis());
             truncateCalenderToDays();
-            edit_text.setOnClickListener(new View.OnClickListener() {
+
+            edit_text.setOnTouchListener(new View.OnTouchListener() {
                 @Override
-                public void onClick(View v) {
-                    new DatePickerDialog(MainActivity.this, EditTextListener.this, myCalendar
-                            .get(Calendar.YEAR), myCalendar.get(Calendar.MONTH),
-                            myCalendar.get(Calendar.DAY_OF_MONTH)).show();
+                public boolean onTouch(View v, MotionEvent event) {
+                    if(event.getAction() == MotionEvent.ACTION_UP){
+                        new DatePickerDialog(MainActivity.this, EditTextListener.this, myCalendar
+                                .get(Calendar.YEAR), myCalendar.get(Calendar.MONTH),
+                                myCalendar.get(Calendar.DAY_OF_MONTH)).show();
+                    }
+
+                    return true;
                 }
             });
+
             String myFormat = "MM/dd/yy"; //In which you need put here
             SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
             edit_text.setText(sdf.format(myCalendar.getTime()));
@@ -118,17 +133,39 @@ public class MainActivity extends AppCompatActivity implements GlobalConstants {
         Log.d("SQL", "registering from pid: " + android.os.Process.myPid());
         registerReceiver(mReceiver,
                 new IntentFilter(LOCATION_UPDATE));
+        registerReceiver(mStatusReceiver, new IntentFilter(BEACON_CONNECTION_UPDATE));
 
         EditText start_text = (EditText) findViewById(R.id.start_text);
         start_text_listen = new EditTextListener(start_text);
         EditText end_text = (EditText) findViewById(R.id.end_text);
         end_text_listen = new EditTextListener(end_text);
+        updateConnectionStatus();
+
+
         reloadData();
+    }
+
+    private void updateConnectionStatus(){
+        RelativeLayout bar = (RelativeLayout) findViewById(R.id.connection_status);
+        TextView status_text = (TextView) findViewById(R.id.connection_status_text);
+        TruckKeeperApplication ta_app = (TruckKeeperApplication)getApplication();
+        if(ta_app.getServiceStatus()){
+            bar.setBackgroundColor(getResources().getColor(R.color.material_deep_teal_500));
+            status_text.setText("Connected");
+            status_text.setTextColor(getResources().getColor(R.color.material_blue_grey_900));
+        }else{
+            bar.setBackgroundColor(getResources().getColor(R.color.material_blue_grey_900));
+            status_text.setText("Disconnected");
+            status_text.setTextColor(getResources().getColor(R.color.white));
+
+        }
+
     }
     @Override
     public void onPause(){
         super.onPause();
         unregisterReceiver(mReceiver);
+        unregisterReceiver(mStatusReceiver);
     }
 
     private void reloadData(){

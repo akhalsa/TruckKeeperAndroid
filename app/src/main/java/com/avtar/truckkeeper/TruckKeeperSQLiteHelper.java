@@ -44,7 +44,7 @@ public class TruckKeeperSQLiteHelper extends SQLiteOpenHelper {
             + TABLE_GAS_EVENT + "("
             + COLUMN_ID + " integer primary key autoincrement, "
             + COLUMN_GALLONS +" integer not null, "
-            + COLUMN_STATE + "text, "
+            + COLUMN_STATE + " text, "
             + COLUMN_TIME_STAMP + " DATETIME not null);";
 
 

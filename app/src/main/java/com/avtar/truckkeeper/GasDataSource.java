@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -74,6 +75,8 @@ public class GasDataSource {
         }
         // make sure to close the cursor
         cursor.close();
+        //return events;
+        Collections.reverse(events);
         return events;
     }
 

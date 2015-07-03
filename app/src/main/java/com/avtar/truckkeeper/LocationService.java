@@ -107,7 +107,7 @@ public class LocationService extends Service implements ConnectionCallbacks, OnC
 
         }
         mLocationRequest = new LocationRequest();
-        mLocationRequest.setInterval(20000);
+        mLocationRequest.setInterval(10000);
         mLocationRequest.setFastestInterval(5000);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         LocationServices.FusedLocationApi.requestLocationUpdates(
@@ -124,23 +124,17 @@ public class LocationService extends Service implements ConnectionCallbacks, OnC
                 LocationPOJO prev_loc_pojo = mLocationDataSource.getMostRecentLocation();
                 Location prev_loc = null;
                 if(prev_loc_pojo != null){
-                    Log.d("GPS", "prev_loc_pojo is not null");
-                    prev_loc = new Location("");
-                    prev_loc.setLongitude(prev_loc_pojo.getLongitude());
-                    prev_loc.setLatitude(prev_loc_pojo.getLatitude());
-                }
-                if(prev_loc == null) {
-
+                    prev_loc = prev_loc_pojo.convertToLocation();
                 }
 
-
-                if((prev_loc == null) || (location.distanceTo(prev_loc) > 250)){
+                if((prev_loc == null) || (location.distanceTo(prev_loc) > 150)){
 
                     Log.d("GPS", "displacement sufficient to record point");
                     Thread t = new Thread(new Runnable(){
                         public void run(){
 
                             reverseGeoCode(location);
+                            sendBroadcast(new Intent(LOCATION_UPDATE));
                         }
                     });
                     t.start();
@@ -189,13 +183,12 @@ public class LocationService extends Service implements ConnectionCallbacks, OnC
         String state = address.getAdminArea();
         LocationPOJO prev_loc = mLocationDataSource.getMostRecentLocation();
         if(prev_loc == null){
-            mLocationDataSource.createLocation(l.getLatitude(), l.getLongitude(),
-                    state, System.currentTimeMillis(), 0);
+            mLocationDataSource.createLocation(l.getLatitude(), l.getLongitude(), state, System.currentTimeMillis(), 0);
         }else{
-            mLocationDataSource.createLocation(l.getLatitude(), l.getLongitude(), state, System.currentTimeMillis(),
-                    GetDistance(prev_loc.getLatitude(), prev_loc.getLongitude(), l.getLatitude(), l.getLongitude()));
+            mLocationDataSource.createLocation(l.getLatitude(), l.getLongitude(), state,
+                    System.currentTimeMillis(), l.distanceTo(prev_loc.convertToLocation()));
         }
-        sendBroadcast(new Intent(LOCATION_UPDATE));
+
 
     }
 
