@@ -1,4 +1,4 @@
-package com.avtar.truckkeeper;
+package com.avtar.truckkeeper.ui;
 
 
 import android.app.AlertDialog;
@@ -13,6 +13,11 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+
+import com.avtar.truckkeeper.GlobalConstants;
+import com.avtar.truckkeeper.R;
+import com.avtar.truckkeeper.dao.GasEventPOJO;
+import com.avtar.truckkeeper.db.GasDataSource;
 
 import java.sql.SQLException;
 import java.util.ArrayList;

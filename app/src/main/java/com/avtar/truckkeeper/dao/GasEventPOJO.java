@@ -1,4 +1,4 @@
-package com.avtar.truckkeeper;
+package com.avtar.truckkeeper.dao;
 
 /**
  * Created by avtar on 6/29/15.

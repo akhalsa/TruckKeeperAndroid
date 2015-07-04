@@ -6,6 +6,8 @@ import android.os.Handler;
 import android.os.RemoteException;
 import android.util.Log;
 
+import com.avtar.truckkeeper.services.LocationService;
+
 import org.altbeacon.beacon.Beacon;
 import org.altbeacon.beacon.BeaconManager;
 import org.altbeacon.beacon.BeaconParser;

@@ -1,4 +1,4 @@
-package com.avtar.truckkeeper;
+package com.avtar.truckkeeper.dao;
 
 import android.location.Location;
 
@@ -9,11 +9,29 @@ import java.util.Calendar;
  * Created by avtar on 6/26/15.
  */
 public class LocationPOJO {
-    public long getId() {
+    private int id;
+    private int prev_id;
+    private long drive_id;
+    private double latitude;
+    private double longitude;
+    private String state;
+    private double dist_to_prev;
+    private long time_stamp;
+
+
+    public int getPrev_id() {
+        return prev_id;
+    }
+
+    public void setPrev_id(int prev_id) {
+        this.prev_id = prev_id;
+    }
+
+    public int getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(int id) {
         this.id = id;
     }
 
@@ -48,12 +66,6 @@ public class LocationPOJO {
     public void setTime_stamp(long time_stamp) {
         this.time_stamp = time_stamp;
     }
-
-    private long id;
-    private String state;
-    private double latitude;
-    private double longitude;
-
     public double getDist_to_prev() {
         return dist_to_prev;
     }
@@ -62,8 +74,16 @@ public class LocationPOJO {
         this.dist_to_prev = dist_to_prev;
     }
 
-    private double dist_to_prev;
-    private long time_stamp;
+    public long getDrive_id() {
+        return drive_id;
+    }
+
+    public void setDrive_id(long drive_id) {
+        this.drive_id = drive_id;
+    }
+
+
+
 
     // Will be used by the ArrayAdapter in the ListView
     @Override

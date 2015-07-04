@@ -1,4 +1,4 @@
-package com.avtar.truckkeeper;
+package com.avtar.truckkeeper.ui;
 
 import android.app.DatePickerDialog;
 import android.content.BroadcastReceiver;
@@ -18,6 +18,12 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.avtar.truckkeeper.GlobalConstants;
+import com.avtar.truckkeeper.R;
+import com.avtar.truckkeeper.TruckKeeperApplication;
+import com.avtar.truckkeeper.dao.LocationPOJO;
+import com.avtar.truckkeeper.db.LocationDataSource;
+
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -36,6 +42,7 @@ public class MainActivity extends AppCompatActivity implements GlobalConstants {
     private BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
+
             reloadData();
         }
     };
@@ -140,7 +147,7 @@ public class MainActivity extends AppCompatActivity implements GlobalConstants {
         EditText end_text = (EditText) findViewById(R.id.end_text);
         end_text_listen = new EditTextListener(end_text);
         updateConnectionStatus();
-
+        mLocationDataSource.computeUnknownDistances();
 
         reloadData();
     }
@@ -182,13 +189,7 @@ public class MainActivity extends AppCompatActivity implements GlobalConstants {
         HashMap<String, Double> mapping = new HashMap<String, Double>();
 
         List<LocationPOJO> values = mLocationDataSource.getLocationsBetweenTimes(start, end);
-        LocationPOJO prev_point = null;
         for(LocationPOJO l : values){
-            //first compute distance deltas
-            if((prev_point == null) || ((l.getTime_stamp() - prev_point.getTime_stamp()) >(1000*60*20) ) ){
-                prev_point = l;
-                continue;
-            }
             double dist = l.getDist_to_prev();
             Log.d("GPS", "distance between points was: "+dist);
             double total = dist * 0.000621371192f;
@@ -196,7 +197,6 @@ public class MainActivity extends AppCompatActivity implements GlobalConstants {
             if (!mapping.containsKey(l.getState())){
                 mapping.put(l.getState(), 0.0);
             }
-            prev_point =l;
             mapping.put(l.getState(), total+mapping.get(l.getState()));
         }
 

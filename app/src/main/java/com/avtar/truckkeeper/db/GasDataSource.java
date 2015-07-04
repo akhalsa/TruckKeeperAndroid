@@ -1,9 +1,11 @@
-package com.avtar.truckkeeper;
+package com.avtar.truckkeeper.db;
 
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+
+import com.avtar.truckkeeper.dao.GasEventPOJO;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
